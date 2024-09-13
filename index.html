@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JWPlayer HLS Example</title>
+    <script src="https://cdn.jwplayer.com/libraries/IDzF9Zmk.js"></script>
+</head>
+<body>
+
+    <h2>Enter HLS URL:</h2>
+    <input type="text" id="hls-url" placeholder="Enter HLS URL here" style="width: 80%;" />
+    <button onclick="playHLS()">Play Video</button>
+
+    <div id="player"></div>
+
+    <script>
+        function base64Decode(str) {
+            return decodeURIComponent(escape(atob(str)));
+        }
+
+        function playHLS() {
+            var encodedUrl = document.getElementById('hls-url').value;
+            if (encodedUrl) {
+                var hlsUrl = base64Decode(encodedUrl);
+                jwplayer("player").setup({
+                    file: hlsUrl,
+                    width: "100%",
+                    aspectratio: "16:9"
+                });
+            } else {
+                alert("Please enter a valid Base64 encoded URL!");
+            }
+        }
+    </script>
+
+</body>
+</html>
