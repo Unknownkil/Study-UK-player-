@@ -3,14 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Web Player</title>
-    <link href="https://vjs.zencdn.net/7.10.2/video-js.css" rel="stylesheet" />
-    <script src="https://vjs.zencdn.net/7.10.2/video.js"></script>
+    <title>StudyUKplayer</title>
+    <script src="https://cdn.jwplayer.com/libraries/IDzF9Zmk.js"></script>
+    <style>
+        /* Add some custom styles for a professional look */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            padding: 20px;
+            border-radius: 10px;
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+        #player {
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
 
-    <video id="my-player" class="video-js" controls preload="auto" width="640" height="264">
-    </video>
+    <div class="container">
+        <h2>Professional HLS Player with Quality and Speed Control</h2>
+
+        <!-- The JWPlayer container -->
+        <div id="player"></div>
+    </div>
 
     <script>
         // Function to get query parameter value by name
@@ -24,24 +55,50 @@
             return decodeURIComponent(escape(atob(str)));
         }
 
-        // Main function to play video
-        function playHLS() {
+        // Main function to initialize and configure JWPlayer
+        function setupJWPlayer() {
             var encodedUrl = getQueryParam('url');
             if (encodedUrl) {
                 var hlsUrl = base64Decode(encodedUrl);
-                var player = videojs('my-player');
-                player.src({
-                    src: hlsUrl,
-                    type: 'application/x-mpegURL'
+
+                // JWPlayer configuration
+                jwplayer("player").setup({
+                    file: hlsUrl,
+                    width: "100%",
+                    aspectratio: "16:9",
+                    autostart: false, // Change to true if you want autostart
+                    controls: true,
+                    playbackRateControls: [0.5, 1, 1.5, 2], // Playback speed control
+                    skin: {
+                        name: "seven" // You can change this skin to customize UI more
+                    },
+                    captions: {
+                        color: "#FFFFFF",
+                        fontSize: 16,
+                        backgroundOpacity: 0,
+                        edgeStyle: "raised"
+                    },
+                    // Adding quality options
+                    qualityLabels: {
+                        "1080": "1080p",
+                        "720": "720p",
+                        "480": "480p",
+                        "360": "360p"
+                    }
                 });
-                player.play();
+
+                // Listener for handling quality changes
+                jwplayer().on('levelsChanged', function(event) {
+                    console.log('Quality level changed to', event.level.label);
+                });
+
             } else {
                 alert("No URL parameter found!");
             }
         }
 
         // Call the function on page load
-        playHLS();
+        setupJWPlayer();
     </script>
 
 </body>
