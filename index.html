@@ -3,35 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JWPlayer HLS Example</title>
-    <script src="https://cdn.jwplayer.com/libraries/IDzF9Zmk.js"></script>
+    <title>My Web Player</title>
+    <link href="https://vjs.zencdn.net/7.10.2/video-js.css" rel="stylesheet" />
+    <script src="https://vjs.zencdn.net/7.10.2/video.js"></script>
 </head>
 <body>
 
-    <h2>Enter HLS URL:</h2>
-    <input type="text" id="hls-url" placeholder="Enter HLS URL here" style="width: 80%;" />
-    <button onclick="playHLS()">Play Video</button>
-
-    <div id="player"></div>
+    <video id="my-player" class="video-js" controls preload="auto" width="640" height="264">
+    </video>
 
     <script>
+        // Function to get query parameter value by name
+        function getQueryParam(param) {
+            var urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(param);
+        }
+
+        // Base64 Decode function
         function base64Decode(str) {
             return decodeURIComponent(escape(atob(str)));
         }
 
+        // Main function to play video
         function playHLS() {
-            var encodedUrl = document.getElementById('hls-url').value;
+            var encodedUrl = getQueryParam('url');
             if (encodedUrl) {
                 var hlsUrl = base64Decode(encodedUrl);
-                jwplayer("player").setup({
-                    file: hlsUrl,
-                    width: "100%",
-                    aspectratio: "16:9"
+                var player = videojs('my-player');
+                player.src({
+                    src: hlsUrl,
+                    type: 'application/x-mpegURL'
                 });
+                player.play();
             } else {
-                alert("Please enter a valid Base64 encoded URL!");
+                alert("No URL parameter found!");
             }
         }
+
+        // Call the function on page load
+        playHLS();
     </script>
 
 </body>
