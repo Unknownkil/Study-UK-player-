@@ -6,7 +6,6 @@
     <title>StudyUKplayer</title>
     <script src="https://cdn.jwplayer.com/libraries/IDzF9Zmk.js"></script>
     <style>
-        /* Add some custom styles for a professional look */
         body {
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
@@ -33,11 +32,8 @@
         #player {
             margin-top: 20px;
         }
-        /* Style for share icon */
+        /* Icon style */
         .share-icon {
-            position: absolute;
-            top: 20px;
-            right: 20px;
             width: 40px;
             height: 40px;
             background-color: #448EE4;
@@ -46,6 +42,8 @@
             justify-content: center;
             align-items: center;
             cursor: pointer;
+            margin: 20px auto 0 auto;
+            position: relative;
         }
         .share-icon:hover {
             background-color: #357bc4;
@@ -53,7 +51,7 @@
         .share-icon img {
             width: 24px;
             height: 24px;
-            filter: invert(1); /* Make the icon white */
+            filter: invert(1); /* White icon */
         }
     </style>
 </head>
@@ -62,17 +60,17 @@
     <div class="container">
         <h2>Welcome to StudyUK player</h2>
 
-        <!-- The JWPlayer container -->
+        <!-- JWPlayer container -->
         <div id="player"></div>
 
-        <!-- Share icon -->
+        <!-- Share icon below the player -->
         <div class="share-icon" id="shareBtn">
             <img src="https://img.icons8.com/ios-filled/50/ffffff/share.png" alt="Share">
         </div>
     </div>
 
     <script>
-        // Function to get query parameter value by name
+        // Function to get query parameter value
         function getQueryParam(param) {
             var urlParams = new URLSearchParams(window.location.search);
             return urlParams.get(param);
@@ -83,22 +81,21 @@
             return decodeURIComponent(escape(atob(str)));
         }
 
-        // Main function to initialize and configure JWPlayer
+        // Main function to setup JWPlayer
         function setupJWPlayer() {
             var encodedUrl = getQueryParam('url');
             if (encodedUrl) {
                 var hlsUrl = base64Decode(encodedUrl);
 
-                // JWPlayer configuration
                 jwplayer("player").setup({
                     file: hlsUrl,
                     width: "100%",
                     aspectratio: "16:9",
-                    autostart: false, // Change to true if you want autostart
+                    autostart: false,
                     controls: true,
-                    playbackRateControls: [0.5, 1, 1.5, 2], // Playback speed control
+                    playbackRateControls: [0.5, 1, 1.5, 2],
                     skin: {
-                        name: "seven" // You can change this skin to customize UI more
+                        name: "seven"
                     },
                     captions: {
                         color: "#FFFFFF",
@@ -106,7 +103,6 @@
                         backgroundOpacity: 0,
                         edgeStyle: "raised"
                     },
-                    // Adding quality options
                     qualityLabels: {
                         "1080": "1080p",
                         "720": "720p",
@@ -115,7 +111,7 @@
                     }
                 });
 
-                // Event listener for share icon
+                // Share icon click event
                 document.getElementById('shareBtn').addEventListener('click', function() {
                     var shareableUrl = window.location.href;
                     prompt("Share this link:", shareableUrl);
@@ -126,9 +122,9 @@
             }
         }
 
-        // Call the function on page load
+        // Initialize the player setup on page load
         setupJWPlayer();
     </script>
 
 </body>
-    </html>
+</html>
