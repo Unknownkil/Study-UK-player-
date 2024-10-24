@@ -100,7 +100,12 @@
 
         // Base64 Decode function
         function base64Decode(str) {
-            return decodeURIComponent(escape(atob(str)));
+            try {
+                return decodeURIComponent(escape(atob(str)));
+            } catch (e) {
+                console.error('Base64 decoding failed:', e);
+                return null;
+            }
         }
 
         // Main function to setup Video.js Player
@@ -108,12 +113,16 @@
             var encodedUrl = getQueryParam('url');
             if (encodedUrl) {
                 var hlsUrl = base64Decode(encodedUrl);
-                var player = videojs('videoPlayer');
-                player.src({
-                    src: hlsUrl,
-                    type: 'application/x-mpegURL'
-                });
-                player.play();
+                if (hlsUrl) {
+                    var player = videojs('videoPlayer');
+                    player.src({
+                        src: hlsUrl,
+                        type: 'application/x-mpegURL'
+                    });
+                    player.play();
+                } else {
+                    alert("Invalid URL parameter!");
+                }
             } else {
                 alert("No URL parameter found!");
             }
