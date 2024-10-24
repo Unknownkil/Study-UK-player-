@@ -4,7 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>StudyUKplayer</title>
-    <script src="https://cdn.jwplayer.com/libraries/IDzF9Zmk.js"></script>
+
+    <!-- Video.js CSS -->
+    <link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet" />
+
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -32,7 +35,6 @@
         #player {
             margin-top: 20px;
         }
-        /* Icon style */
         .share-icon {
             width: 40px;
             height: 40px;
@@ -60,14 +62,22 @@
     <div class="container">
         <h2>Welcome to StudyUK player</h2>
 
-        <!-- JWPlayer container -->
-        <div id="player"></div>
+        <!-- Video.js player container -->
+        <video id="videoPlayer" class="video-js vjs-default-skin" controls preload="auto" width="100%" height="400" data-setup="{}">
+            <source src="" type="application/x-mpegURL">
+            Your browser does not support the video tag.
+        </video>
 
         <!-- Share icon below the player -->
         <div class="share-icon" id="shareBtn">
             <img src="https://img.icons8.com/ios-filled/50/ffffff/share.png" alt="Share">
         </div>
     </div>
+
+    <!-- Video.js JS -->
+    <script src="https://vjs.zencdn.net/7.20.3/video.min.js"></script>
+    <!-- HLS plugin for Video.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/videojs-contrib-hls/5.15.0/videojs-contrib-hls.min.js"></script>
 
     <script>
         // Function to get query parameter value
@@ -81,49 +91,30 @@
             return decodeURIComponent(escape(atob(str)));
         }
 
-        // Main function to setup JWPlayer
-        function setupJWPlayer() {
+        // Main function to setup Video.js Player
+        function setupVideoPlayer() {
             var encodedUrl = getQueryParam('url');
             if (encodedUrl) {
                 var hlsUrl = base64Decode(encodedUrl);
-
-                jwplayer("player").setup({
-                    file: hlsUrl,
-                    width: "100%",
-                    aspectratio: "16:9",
-                    autostart: false,
-                    controls: true,
-                    playbackRateControls: [0.5, 1, 1.5, 2],
-                    skin: {
-                        name: "seven"
-                    },
-                    captions: {
-                        color: "#FFFFFF",
-                        fontSize: 16,
-                        backgroundOpacity: 0,
-                        edgeStyle: "raised"
-                    },
-                    qualityLabels: {
-                        "1080": "1080p",
-                        "720": "720p",
-                        "480": "480p",
-                        "360": "360p"
-                    }
+                var player = videojs('videoPlayer');
+                player.src({
+                    src: hlsUrl,
+                    type: 'application/x-mpegURL'
                 });
-
-                // Share icon click event
-                document.getElementById('shareBtn').addEventListener('click', function() {
-                    var shareableUrl = window.location.href;
-                    prompt("Share this link:", shareableUrl);
-                });
-
+                player.play();
             } else {
                 alert("No URL parameter found!");
             }
         }
 
         // Initialize the player setup on page load
-        setupJWPlayer();
+        setupVideoPlayer();
+
+        // Share icon click event
+        document.getElementById('shareBtn').addEventListener('click', function() {
+            var shareableUrl = window.location.href;
+            prompt("Share this link:", shareableUrl);
+        });
     </script>
 
 </body>
