@@ -47,7 +47,14 @@
             height: 100%;
         }
 
-        .share-icon {
+        .icon-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .icon {
             width: 40px;
             height: 40px;
             background-color: #448EE4;
@@ -56,16 +63,38 @@
             justify-content: center;
             align-items: center;
             cursor: pointer;
-            margin: 20px auto 0 auto;
             position: relative;
         }
-        .share-icon:hover {
+        .icon:hover {
             background-color: #357bc4;
         }
-        .share-icon img {
+        .icon img {
             width: 24px;
             height: 24px;
             filter: invert(1); /* White icon */
+        }
+
+        /* Quality selector dropdown */
+        .quality-options {
+            display: none;
+            position: absolute;
+            top: 50px;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-radius: 5px;
+            overflow: hidden;
+            z-index: 100;
+        }
+        .quality-options button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            border: none;
+            background-color: #fff;
+            cursor: pointer;
+        }
+        .quality-options button:hover {
+            background-color: #f0f0f0;
         }
     </style>
 </head>
@@ -82,9 +111,21 @@
             </video>
         </div>
 
-        <!-- Share icon below the player -->
-        <div class="share-icon" id="shareBtn">
-            <img src="https://img.icons8.com/ios-filled/50/ffffff/share.png" alt="Share">
+        <!-- Icon container for share and quality -->
+        <div class="icon-container">
+            <div class="icon" id="shareBtn">
+                <img src="https://img.icons8.com/ios-filled/50/ffffff/share.png" alt="Share">
+            </div>
+            <div class="icon" id="qualityBtn">
+                <img src="https://img.icons8.com/ios-filled/50/ffffff/hd.png" alt="Quality">
+            </div>
+        </div>
+
+        <!-- Quality options dropdown -->
+        <div class="quality-options" id="qualityOptions">
+            <button onclick="setQuality('low')">Low</button>
+            <button onclick="setQuality('medium')">Medium</button>
+            <button onclick="setQuality('high')">High</button>
         </div>
     </div>
 
@@ -138,6 +179,37 @@
             var shareableUrl = window.location.href;
             prompt("Share this link:", shareableUrl);
         });
+
+        // Toggle quality options dropdown
+        document.getElementById('qualityBtn').addEventListener('click', function() {
+            var qualityOptions = document.getElementById('qualityOptions');
+            qualityOptions.style.display = (qualityOptions.style.display === 'none' || !qualityOptions.style.display) ? 'block' : 'none';
+        });
+
+        // Function to set video quality
+        function setQuality(quality) {
+            var player = videojs('videoPlayer');
+            var hlsUrl = getQueryParam('url');
+            if (hlsUrl) {
+                hlsUrl = base64Decode(hlsUrl);
+                if (hlsUrl) {
+                    // Logic to set different quality URLs, assuming we have URLs with different quality levels
+                    if (quality === 'low') {
+                        hlsUrl += '&quality=low';
+                    } else if (quality === 'medium') {
+                        hlsUrl += '&quality=medium';
+                    } else if (quality === 'high') {
+                        hlsUrl += '&quality=high';
+                    }
+                    player.src({
+                        src: hlsUrl,
+                        type: 'application/x-mpegURL'
+                    });
+                    player.play();
+                }
+            }
+            document.getElementById('qualityOptions').style.display = 'none';
+        }
     </script>
 
 </body>
