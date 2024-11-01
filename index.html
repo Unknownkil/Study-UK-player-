@@ -32,10 +32,9 @@
             text-align: center;
             color: #333;
         }
-        /* Making video player responsive */
         .video-container {
             position: relative;
-            padding-top: 56.25%; /* 16:9 Aspect Ratio */
+            padding-top: 56.25%;
             max-width: 100%;
             height: auto;
         }
@@ -46,14 +45,12 @@
             width: 100%;
             height: 100%;
         }
-
         .icon-container {
             display: flex;
             justify-content: center;
             gap: 15px;
             margin-top: 20px;
         }
-
         .icon {
             width: 40px;
             height: 40px;
@@ -71,11 +68,9 @@
         .icon img {
             width: 24px;
             height: 24px;
-            filter: invert(1); /* White icon */
+            filter: invert(1);
         }
-
-        /* Quality selector dropdown */
-        .quality-options {
+        .quality-options, .speed-options {
             display: none;
             position: absolute;
             top: 50px;
@@ -85,7 +80,7 @@
             overflow: hidden;
             z-index: 100;
         }
-        .quality-options button {
+        .quality-options button, .speed-options button {
             display: block;
             width: 100%;
             padding: 10px;
@@ -93,124 +88,136 @@
             background-color: #fff;
             cursor: pointer;
         }
-        .quality-options button:hover {
+        .quality-options button:hover, .speed-options button:hover {
             background-color: #f0f0f0;
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h2>Welcome to StudyUK player</h2>
+<div class="container">
+    <h2>Welcome to StudyUK player</h2>
+    <div class="video-container">
+        <video id="videoPlayer" class="video-js vjs-default-skin" controls preload="auto" data-setup='{"controls": true, "fluid": true, "aspectRatio":"16:9"}'>
+            <source src="" type="application/x-mpegURL">
+            Your browser does not support the video tag.
+        </video>
+    </div>
 
-        <!-- Responsive video player container -->
-        <div class="video-container">
-            <video id="videoPlayer" class="video-js vjs-default-skin" controls preload="auto" data-setup='{"controls": true, "fluid": true, "aspectRatio":"16:9", "playbackRates": [0.5, 1, 1.5, 2]}'>
-                <source src="" type="application/x-mpegURL">
-                Your browser does not support the video tag.
-            </video>
+    <div class="icon-container">
+        <div class="icon" id="shareBtn">
+            <img src="https://img.icons8.com/ios-filled/50/ffffff/share.png" alt="Share">
         </div>
-
-        <!-- Icon container for share and quality -->
-        <div class="icon-container">
-            <div class="icon" id="shareBtn">
-                <img src="https://img.icons8.com/ios-filled/50/ffffff/share.png" alt="Share">
-            </div>
-            <div class="icon" id="qualityBtn">
-                <img src="https://img.icons8.com/ios-filled/50/ffffff/hd.png" alt="Quality">
-            </div>
+        <div class="icon" id="qualityBtn">
+            <img src="https://img.icons8.com/ios-filled/50/ffffff/hd.png" alt="Quality">
         </div>
-
-        <!-- Quality options dropdown -->
-        <div class="quality-options" id="qualityOptions">
-            <button onclick="setQuality('low')">Low</button>
-            <button onclick="setQuality('medium')">Medium</button>
-            <button onclick="setQuality('high')">High</button>
+        <div class="icon" id="speedBtn">
+            <img src="https://img.icons8.com/ios-filled/50/ffffff/fast-forward.png" alt="Speed">
         </div>
     </div>
 
-    <!-- Video.js JS -->
-    <script src="https://vjs.zencdn.net/7.20.3/video.min.js"></script>
-    <!-- HLS plugin for Video.js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/videojs-contrib-hls/5.15.0/videojs-contrib-hls.min.js"></script>
+    <!-- Quality options dropdown -->
+    <div class="quality-options" id="qualityOptions">
+        <button onclick="setQuality('low')">Low</button>
+        <button onclick="setQuality('medium')">Medium</button>
+        <button onclick="setQuality('high')">High</button>
+    </div>
 
-    <script>
-        // Function to get query parameter value
-        function getQueryParam(param) {
-            var urlParams = new URLSearchParams(window.location.search);
-            return urlParams.get(param);
+    <!-- Speed options dropdown -->
+    <div class="speed-options" id="speedOptions">
+        <button onclick="setSpeed(0.5)">0.5x</button>
+        <button onclick="setSpeed(1)">1x</button>
+        <button onclick="setSpeed(1.5)">1.5x</button>
+        <button onclick="setSpeed(2)">2x</button>
+    </div>
+</div>
+
+<!-- Video.js JS -->
+<script src="https://vjs.zencdn.net/7.20.3/video.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/videojs-contrib-hls/5.15.0/videojs-contrib-hls.min.js"></script>
+
+<script>
+    let lastTap = 0;
+    const player = videojs('videoPlayer');
+
+    function getQueryParam(param) {
+        var urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(param);
+    }
+
+    function base64Decode(str) {
+        try {
+            return decodeURIComponent(escape(atob(str)));
+        } catch (e) {
+            console.error('Base64 decoding failed:', e);
+            return null;
         }
+    }
 
-        // Base64 Decode function
-        function base64Decode(str) {
-            try {
-                return decodeURIComponent(escape(atob(str)));
-            } catch (e) {
-                console.error('Base64 decoding failed:', e);
-                return null;
-            }
-        }
-
-        // Main function to setup Video.js Player
-        function setupVideoPlayer() {
-            var encodedUrl = getQueryParam('url');
-            if (encodedUrl) {
-                var hlsUrl = base64Decode(encodedUrl);
-                if (hlsUrl) {
-                    var player = videojs('videoPlayer');
-                    player.src({
-                        src: hlsUrl,
-                        type: 'application/x-mpegURL'
-                    });
-                    player.play();
-                } else {
-                    alert("Invalid URL parameter!");
-                }
-            } else {
-                alert("No URL parameter found!");
-            }
-        }
-
-        // Initialize the player setup on page load
-        setupVideoPlayer();
-
-        // Share icon click event
-        document.getElementById('shareBtn').addEventListener('click', function() {
-            var shareableUrl = window.location.href;
-            prompt("Share this link:", shareableUrl);
-        });
-
-        // Toggle quality options dropdown
-        document.getElementById('qualityBtn').addEventListener('click', function() {
-            var qualityOptions = document.getElementById('qualityOptions');
-            qualityOptions.style.display = (qualityOptions.style.display === 'none' || !qualityOptions.style.display) ? 'block' : 'none';
-        });
-
-        // Function to set video quality
-        function setQuality(quality) {
-            var player = videojs('videoPlayer');
-            var hlsUrl = getQueryParam('url');
+    function setupVideoPlayer() {
+        const encodedUrl = getQueryParam('url');
+        if (encodedUrl) {
+            const hlsUrl = base64Decode(encodedUrl);
             if (hlsUrl) {
-                hlsUrl = base64Decode(hlsUrl);
-                if (hlsUrl) {
-                    // Logic to set different quality URLs, assuming we have URLs with different quality levels
-                    if (quality === 'low') {
-                        hlsUrl += '&quality=low';
-                    } else if (quality === 'medium') {
-                        hlsUrl += '&quality=medium';
-                    } else if (quality === 'high') {
-                        hlsUrl += '&quality=high';
-                    }
-                    player.src({
-                        src: hlsUrl,
-                        type: 'application/x-mpegURL'
-                    });
-                    player.play();
-                }
+                player.src({ src: hlsUrl, type: 'application/x-mpegURL' });
+                player.play();
+            } else {
+                alert("Invalid URL parameter!");
             }
-            document.getElementById('qualityOptions').style.display = 'none';
+        } else {
+            alert("No URL parameter found!");
         }
-    </script>
+    }
+    setupVideoPlayer();
+
+    document.getElementById('shareBtn').addEventListener('click', function() {
+        const shareableUrl = window.location.href;
+        prompt("Share this link:", shareableUrl);
+    });
+
+    document.getElementById('qualityBtn').addEventListener('click', function() {
+        const qualityOptions = document.getElementById('qualityOptions');
+        qualityOptions.style.display = qualityOptions.style.display === 'none' ? 'block' : 'none';
+    });
+
+    document.getElementById('speedBtn').addEventListener('click', function() {
+        const speedOptions = document.getElementById('speedOptions');
+        speedOptions.style.display = speedOptions.style.display === 'none' ? 'block' : 'none';
+    });
+
+    function setQuality(quality) {
+        const hlsUrl = base64Decode(getQueryParam('url'));
+        if (hlsUrl) {
+            player.src({ src: `${hlsUrl}&quality=${quality}`, type: 'application/x-mpegURL' });
+            player.play();
+        }
+        document.getElementById('qualityOptions').style.display = 'none';
+    }
+
+    function setSpeed(speed) {
+        player.playbackRate(speed);
+        document.getElementById('speedOptions').style.display = 'none';
+    }
+
+    document.getElementById('videoPlayer_html5_api').addEventListener('touchend', (e) => {
+        const currentTime = new Date().getTime();
+        const tapLength = currentTime - lastTap;
+        if (tapLength < 500 && tapLength > 0) {
+            const seekTime = e.target.clientWidth / 2 > e.changedTouches[0].clientX ? -10 : 10;
+            player.currentTime(player.currentTime() + seekTime);
+        }
+        lastTap = currentTime;
+    });
+
+    document.getElementById('videoPlayer_html5_api').addEventListener('touchstart', function(e) {
+        const longPressDuration = 700;
+        const longPressTimeout = setTimeout(() => player.playbackRate(2), longPressDuration);
+        e.target.addEventListener('touchend', () => {
+            clearTimeout(longPressTimeout);
+            player.playbackRate(1);
+        });
+    });
+</script>
 
 </body>
 </html>
